@@ -1,0 +1,9 @@
+# node_modules 是 npm 下载的依赖包，不用上传
+# 别人 clone 你的项目后，自己跑 npm install 就能装
+# PM类比：就像你不会把 Figma 插件文件夹一起发给同事，
+#       你只发设计稿，同事自己装一样的插件
+node_modules/
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db

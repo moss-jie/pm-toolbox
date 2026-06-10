@@ -1,0 +1,20 @@
+{
+  "name": "pm-toolbox",
+  "version": "1.0.0",
+  "description": "默默的产品经理工具箱 —— 用代码提升工作效率",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "hello": "node src/hello.js"
+  },
+  "keywords": [
+    "pm",
+    "toolbox",
+    "productivity"
+  ],
+  "author": "默默",
+  "license": "MIT",
+  "dependencies": {
+    "dayjs": "^1.11.21"
+  }
+}
