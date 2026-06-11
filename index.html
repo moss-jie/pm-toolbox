@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>默默 · PM 工具箱</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    /* 顶部 */
+    .header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #58a6ff, #bc8cff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p {
+      color: #8b949e;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+    .header .stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-num {
+      font-size: 28px;
+      font-weight: 700;
+      color: #58a6ff;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: #8b949e;
+    }
+
+    /* 工具卡片网格 */
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .tool-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 12px;
+      padding: 24px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      display: block;
+    }
+    .tool-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .tool-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+    .tool-card h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+    }
+    .tool-card p {
+      font-size: 13px;
+      color: #8b949e;
+      line-height: 1.5;
+    }
+    .tool-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .tool-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: rgba(88,166,255,0.1);
+      color: #58a6ff;
+    }
+    .tool-tag.js  { background: rgba(240,219,79,0.1);  color: #f0db4f; }
+    .tool-tag.css { background: rgba(86,180,233,0.1); color: #56b4e9; }
+    .tool-tag.ai  { background: rgba(160,100,235,0.1); color: #a064eb; }
+
+    /* GitHub 链接 */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      padding: 24px;
+    }
+    .footer a {
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .footer a:hover { color: #58a6ff; }
+
+    /* 主题切换 */
+    .theme-toggle {
+      position: fixed;
+      top: 20px; right: 20px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid #30363d;
+      background: #161b22;
+      color: #c9d1d9;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    body.light {
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    body.light .tool-card {
+      background: #ffffff;
+      border-color: #d0d7de;
+    }
+    body.light .tool-card:hover {
+      border-color: #0969da;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    body.light .tool-card p { color: #656d76; }
+    body.light .header p { color: #656d76; }
+    body.light .stat-num { color: #0969da; }
+    body.light .stat-label { color: #656d76; }
+    body.light .theme-toggle {
+      background: #ffffff;
+      border-color: #d0d7de;
+      color: #1f2328;
+    }
+    body.light .footer a { color: #656d76; }
+  </style>
+</head>
+
+<body>
+
+  <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+
+  <div class="container">
+    <div class="header">
+      <h1>🧰 默默的产品经理工具箱</h1>
+      <p>一个 PM 学习编程的实战项目 — 用代码提升工作效率</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">4</div>
+          <div class="stat-label">工具</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">9</div>
+          <div class="stat-label">提交</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">3</div>
+          <div class="stat-label">技术栈</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tool-grid">
+      <!-- 工具卡片 -->
+      <a href="src/hello.js" class="tool-card">
+        <div class="tool-icon">📝</div>
+        <h3>每日日志生成器</h3>
+        <p>自动生成 Markdown 格式的每日工作日志模板</p>
+        <div class="tool-tags">
+          <span class="tool-tag js">Node.js</span>
+          <span class="tool-tag">文件读写</span>
+        </div>
+      </a>
+
+      <a href="src/card/index.html" class="tool-card">
+        <div class="tool-icon">🎨</div>
+        <h3>个人名片页</h3>
+        <p>毛玻璃风格名片，HTML + CSS 纯静态页面</p>
+        <div class="tool-tags">
+          <span class="tool-tag">HTML</span>
+          <span class="tool-tag css">CSS</span>
+        </div>
+      </a>
+
+      <a href="src/calculator/index.html" class="tool-card">
+        <div class="tool-icon">📊</div>
+        <h3>需求优先级打分器</h3>
+        <p>加权评分 + 可视化条形图 + 亮暗主题切换</p>
+        <div class="tool-tags">
+          <span class="tool-tag js">JavaScript</span>
+          <span class="tool-tag">DOM 操作</span>
+          <span class="tool-tag css">CSS</span>
+        </div>
+      </a>
+
+      <a href="src/prd2task/index.html" class="tool-card">
+        <div class="tool-icon">📋</div>
+        <h3>PRD → 开发任务</h3>
+        <p>粘贴 PRD，AI 智能拆解 + 规则引擎，支持导出</p>
+        <div class="tool-tags">
+          <span class="tool-tag js">JavaScript</span>
+          <span class="tool-tag ai">AI API</span>
+          <span class="tool-tag">导出</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="footer">
+      <a href="https://github.com/moss-jie/pm-toolbox" target="_blank">
+        🐙 查看 GitHub 仓库
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light');
+      toggle.textContent = '☀️';
+    }
+    toggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light');
+      toggle.textContent = isLight ? '☀️' : '🌙';
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+  </script>
+
+</body>
+
+</html>
