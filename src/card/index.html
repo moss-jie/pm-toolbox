@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<!--
+  DOCTYPE html = 告诉浏览器"这是一张 HTML5 网页"
+  PM 类比：就像新建文档时选"Word 文档"而不是"纯文本"
+-->
+<html lang="zh-CN">
+<!-- lang="zh-CN" = 网页语言是简体中文，搜索引擎和屏幕阅读器会知道 -->
+
+<head>
+  <!--
+    head = 网页的「元数据区」—— 给浏览器和搜索引擎看的信息
+    用户不会直接看到这里的内容，但它决定了网页的行为
+    PM 类比：就像 PRD 文档的属性栏——标题、作者、编码格式
+  -->
+  <meta charset="UTF-8">
+  <!-- charset="UTF-8" = 用 UTF-8 编码，确保中文不会变成乱码 -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport = 让网页在手机上也能正常缩放显示 -->
+
+  <title>默默的个人名片</title>
+  <!-- title = 浏览器标签页上显示的文字 -->
+
+  <!--
+    style 标签 = 网页的「样式表」—— CSS 写在这里
+    CSS = Cascading Style Sheets（层叠样式表）
+    PM 类比：就像 Figma 设计稿里每个元素的属性面板
+    HTML 是"有什么"（骨架），CSS 是"长什么样"（皮肤）
+  -->
+  <style>
+    /* ============================================
+       CSS 基础语法：
+       选择器 {
+         属性: 值;
+         属性: 值;
+       }
+       选择器 = 你想给谁设置样式
+       属性: 值 = 设置成什么样
+       ============================================ */
+
+    /* --- ① 全局重置：把所有元素的默认边距清零 --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      /* box-sizing: border-box
+         意思是"宽高包含边框和内边距"
+         不加这个的话，padding 会撑大元素，很难算尺寸 */
+    }
+
+    /* --- ② body = 整个网页的背景和字体 --- */
+    body {
+      /* 背景渐变：从深蓝渐变到紫色 */
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      /* linear-gradient(角度, 颜色1 位置, 颜色2 位置, ...)
+         从左上角(135度)开始，依次过渡三种颜色 */
+
+      /* 让卡片在屏幕正中央 */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      /* 100vh = 100% 的视口高度（viewport height），即整个屏幕的高度 */
+
+      /* 字体 */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      /* 字体优先级：苹果系统 → 其它 → 微软雅黑 → 无衬线体兜底 */
+      color: #ffffff;
+    }
+
+    /* --- ③ 卡片容器：那张"名片" --- */
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      /* rgba = 红绿蓝 + 透明度
+         0.08 = 8% 不透明，即 92% 透明 —— 毛玻璃效果 */
+
+      backdrop-filter: blur(20px);
+      /* 背景模糊：让卡片后面的背景模糊掉，做出毛玻璃质感 */
+
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px;
+      /* border-radius = 圆角，24px 是比较大的圆角 */
+
+      padding: 48px 40px;
+      /* padding = 内边距：上下48px，左右40px */
+
+      max-width: 420px;
+      /* 卡片最多420px宽，在手机上会自动缩小 */
+
+      text-align: center;
+      /* 文字居中 */
+
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+      /* 阴影：向右0、向下24px、模糊64px */
+    }
+
+    /* --- ④ 头像：一个圆形区域 --- */
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      /* border-radius: 50% = 正圆（正方形 + 50% = 圆） */
+
+      background: linear-gradient(135deg, #e94560, #ff6b6b);
+      /* 红粉渐变，在没有真实头像时作为占位 */
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      margin: 0 auto 24px;
+      /* margin: 上 左右 下 → 0 自动 24px
+         "auto" 在左右时 = 居中 */
+
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    /* --- ⑤ 标题和描述 --- */
+    .card h1 {
+      font-size: 28px;
+      font-weight: 700;
+      /* 700 = Bold（加粗） */
+      margin-bottom: 8px;
+    }
+
+    .card .role {
+      font-size: 16px;
+      color: #a0a0b8;
+      /* 次要文字用灰色，建立视觉层级 */
+      margin-bottom: 24px;
+    }
+
+    /* --- ⑥ 标签列表：技能标签 --- */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      /* flex-wrap: wrap = 一行放不下就换行 */
+      justify-content: center;
+      gap: 8px;
+      /* gap = 标签之间的间距 */
+
+      margin-bottom: 32px;
+    }
+
+    .tag {
+      background: rgba(233, 69, 96, 0.2);
+      /* 半透明的红色背景 */
+      border: 1px solid rgba(233, 69, 96, 0.4);
+      border-radius: 20px;
+      /* 胶囊形 */
+      padding: 6px 16px;
+      font-size: 14px;
+      color: #ff8a9e;
+    }
+
+    /* --- ⑦ 联系方式 --- */
+    .contact {
+      display: flex;
+      flex-direction: column;
+      /* 纵向排列 */
+      gap: 12px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+
+      font-size: 15px;
+      color: #c0c0d0;
+
+      transition: background 0.2s;
+      /* transition = 过渡动画：背景变化用0.2秒平滑过渡 */
+    }
+
+    .contact-item:hover {
+      /* :hover = 鼠标悬停时的样式 */
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .icon {
+      font-size: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!--
+    body = 网页的「可见区」—— 用户能看到的所有内容
+    这里面的标签（div、h1、span 等）就是页面上真实显示的东西
+  -->
+
+  <!-- div = 一个「盒子」，用来包裹一组内容 -->
+  <div class="card">
+    <!-- class="card" = 给这个 div 贴上"card"标签，
+         CSS 里通过 .card 找到它并应用样式 -->
+
+    <!-- 头像区域 -->
+    <div class="avatar">🐣</div>
+
+    <!-- h1 = 一级标题，一个页面一般只有一个 -->
+    <h1>默默</h1>
+
+    <!-- p = 段落，role 类用来放职位描述 -->
+    <p class="role">产品经理 · 正在学习写代码</p>
+
+    <!-- 技能标签 -->
+    <div class="tags">
+      <!-- span = 行内元素，不换行，适合做标签 -->
+      <span class="tag">产品设计</span>
+      <span class="tag">用户研究</span>
+      <span class="tag">数据分析</span>
+      <span class="tag">HTML & CSS</span>
+      <span class="tag">JavaScript</span>
+    </div>
+
+    <!-- 联系方式 -->
+    <div class="contact">
+      <div class="contact-item">
+        <span class="icon">📧</span>
+        <span>momo@pm-toolbox.dev</span>
+      </div>
+      <div class="contact-item">
+        <span class="icon">🐙</span>
+        <span>github.com/moss-jie</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
