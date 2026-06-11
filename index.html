@@ -55,6 +55,42 @@
       font-size: 12px;
       color: #8b949e;
     }
+    .stat.clickable { cursor: pointer; transition: transform 0.2s; }
+    .stat.clickable:hover { transform: translateY(-2px); }
+    .stat.clickable:hover .stat-num { color: #bc8cff; }
+
+    .detail-panel {
+      max-width: 500px;
+      margin: 16px auto 0;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: none;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .detail-panel.show { display: block; }
+    .detail-panel h3 { font-size: 15px; margin-bottom: 8px; }
+    .detail-panel .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+    .detail-panel .mini-tag {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .mini-tag.html { background: rgba(228,77,38,0.15); color: #e44d26; }
+    .mini-tag.css  { background: rgba(86,180,233,0.15); color: #56b4e9; }
+    .mini-tag.js   { background: rgba(240,219,79,0.15); color: #f0db4f; }
+    .mini-tag.node { background: rgba(131,205,41,0.15); color: #83cd29; }
+    .mini-tag.git  { background: rgba(240,80,51,0.15); color: #f05033; }
+    .mini-tag.ai   { background: rgba(160,100,235,0.15); color: #a064eb; }
+
+    body.light .detail-panel {
+      background: #ffffff;
+      border-color: #d0d7de;
+    }
 
     /* 工具卡片网格 */
     .tool-grid {
@@ -171,19 +207,20 @@
       <h1>🧰 默默的产品经理工具箱</h1>
       <p>一个 PM 学习编程的实战项目 — 用代码提升工作效率</p>
       <div class="stats">
-        <div class="stat">
+        <div class="stat clickable" id="statTools">
           <div class="stat-num">4</div>
-          <div class="stat-label">工具</div>
+          <div class="stat-label">工具 ▾</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">9</div>
-          <div class="stat-label">提交</div>
+        <div class="stat clickable" id="statCommits">
+          <div class="stat-num">14</div>
+          <div class="stat-label">提交 ▾</div>
         </div>
-        <div class="stat">
-          <div class="stat-num">3</div>
-          <div class="stat-label">技术栈</div>
+        <div class="stat clickable" id="statTech">
+          <div class="stat-num">6</div>
+          <div class="stat-label">技术栈 ▾</div>
         </div>
       </div>
+      <div class="detail-panel" id="detailPanel"></div>
     </div>
 
     <div class="tool-grid">
@@ -248,6 +285,61 @@
       const isLight = document.body.classList.toggle('light');
       toggle.textContent = isLight ? '☀️' : '🌙';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+
+    // 统计数据下钻
+    const panel = document.getElementById('detailPanel');
+    let currentOpen = null;
+
+    const details = {
+      tools: `
+        <h3>🛠️ 4 个工具</h3>
+        <div class="tag-row">
+          <span class="mini-tag js">📝 每日工作日志</span>
+          <span class="mini-tag html">🎨 个人名片页</span>
+          <span class="mini-tag js">📊 需求优先级打分器</span>
+          <span class="mini-tag ai">📋 PRD→开发任务</span>
+        </div>
+      `,
+      commits: `
+        <h3>📜 14 次提交</h3>
+        最新：日志工具大改版 · PRD转换器接入AI · 左右分栏布局<br>
+        <a href="https://github.com/moss-jie/pm-toolbox/commits/master" target="_blank" style="color:#58a6ff;">查看完整提交历史 →</a>
+      `,
+      tech: `
+        <h3>🧬 6 项技术栈</h3>
+        <div class="tag-row">
+          <span class="mini-tag html">HTML5</span>
+          <span class="mini-tag css">CSS3</span>
+          <span class="mini-tag js">JavaScript</span>
+          <span class="mini-tag node">Node.js</span>
+          <span class="mini-tag git">Git</span>
+          <span class="mini-tag ai">DeepSeek API</span>
+        </div>
+      `,
+    };
+
+    function showDetail(key) {
+      if (currentOpen === key) {
+        panel.classList.remove('show');
+        currentOpen = null;
+      } else {
+        panel.innerHTML = details[key];
+        panel.classList.add('show');
+        currentOpen = key;
+      }
+    }
+
+    document.getElementById('statTools').addEventListener('click', () => showDetail('tools'));
+    document.getElementById('statCommits').addEventListener('click', () => showDetail('commits'));
+    document.getElementById('statTech').addEventListener('click', () => showDetail('tech'));
+
+    // 点击面板外关闭
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.stat') && !e.target.closest('.detail-panel')) {
+        panel.classList.remove('show');
+        currentOpen = null;
+      }
     });
   </script>
 
