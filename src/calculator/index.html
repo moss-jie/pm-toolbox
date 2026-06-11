@@ -240,6 +240,23 @@
     /* ============================================
        主题切换按钮
        ============================================ */
+    .back-btn {
+      position: fixed;
+      top: 20px; left: 20px;
+      padding: 8px 14px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #8b949e;
+      text-decoration: none;
+      font-size: 13px;
+      z-index: 999;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { color: #58a6ff; border-color: #58a6ff; }
+    body.light .back-btn { background: #ffffff; border-color: #d0d7de; color: #656d76; }
+    body.light .back-btn:hover { color: #0969da; border-color: #0969da; }
+
     .theme-toggle {
       position: fixed;
       top: 20px;
@@ -397,6 +414,7 @@
 <body>
 
   <!-- 主题切换按钮 -->
+  <a href="../../index.html" class="back-btn" title="返回导航页">← 返回</a>
   <button class="theme-toggle" id="themeToggle" title="切换白天/黑夜模式">🌙</button>
 
   <div class="container">
