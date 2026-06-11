@@ -13,100 +13,152 @@
       background: #0d1117;
       color: #c9d1d9;
       font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
+      padding: 30px 20px;
       min-height: 100vh;
     }
 
-    .container { width: 100%; max-width: 650px; }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto 20px;
+    }
+    .top-bar h1 { font-size: 22px; }
+    .top-bar .date-badge {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 14px;
+      color: #58a6ff;
+    }
 
-    h1 { font-size: 24px; margin-bottom: 4px; }
-    .subtitle { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+    /* 左右布局 */
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
 
-    .section {
+    .panel {
       background: #161b22;
       border: 1px solid #21262d;
       border-radius: 10px;
       padding: 20px;
-      margin-bottom: 16px;
     }
-    .section label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+    .panel h2 { font-size: 16px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #21262d; }
+
+    /* 左面板：输入 */
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 13px; color: #8b949e; margin-bottom: 6px; }
     textarea {
       width: 100%;
       background: #0d1117;
       border: 1px solid #30363d;
-      border-radius: 8px;
+      border-radius: 6px;
       color: #c9d1d9;
-      font-size: 14px;
+      font-size: 13px;
       padding: 10px;
       resize: vertical;
       font-family: inherit;
       outline: none;
-      min-height: 80px;
     }
     textarea:focus { border-color: #58a6ff; }
     textarea::placeholder { color: #484f58; }
+    textarea.tall { min-height: 80px; }
 
-    .btn-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
       transition: background 0.2s;
     }
-    .btn-primary { background: #238636; color: white; flex: 1; }
-    .btn-primary:hover { background: #2ea043; }
+    .btn-save   { background: #238636; color: white; }
+    .btn-save:hover { background: #2ea043; }
     .btn-export { background: #1f6feb; color: white; }
     .btn-export:hover { background: #388bfd; }
-    .btn-clear { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+    .btn-clear  { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
     .btn-clear:hover { background: #30363d; }
 
-    .preview {
-      background: #161b22;
-      border: 1px solid #21262d;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 16px;
-      display: none;
-    }
-    .preview h2 { font-size: 18px; margin-bottom: 12px; }
+    /* 右面板：预览 */
     .preview-content {
       background: #0d1117;
       border-radius: 6px;
       padding: 16px;
       font-size: 13px;
       line-height: 1.7;
-      white-space: pre-wrap;
+      min-height: 300px;
       max-height: 500px;
       overflow-y: auto;
+      white-space: pre-wrap;
     }
+    .preview-content h1 { font-size: 18px; margin-bottom: 8px; }
+    .preview-content h2 { font-size: 15px; margin: 14px 0 6px; border: none; padding: 0; }
+
+    /* 底部：历史记录 */
+    .history-section {
+      max-width: 1100px;
+      margin: 20px auto 0;
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .history-section h2 { font-size: 16px; margin-bottom: 14px; }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .history-item:hover { border-color: #58a6ff; }
+    .history-item .h-date { font-weight: 600; color: #58a6ff; }
+    .history-item .h-preview { color: #8b949e; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-item .h-actions { display: flex; gap: 6px; }
+    .h-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+    }
+    .h-btn:hover { background: #30363d; }
+    .h-btn.danger { color: #f85149; border-color: #f85149; }
+    .h-btn.danger:hover { background: rgba(248,81,73,0.1); }
+
+    .empty-hint { color: #484f58; font-size: 14px; text-align: center; padding: 20px; }
 
     /* 亮色 */
     body.light { background: #f6f8fa; color: #1f2328; }
-    body.light .subtitle { color: #656d76; }
-    body.light .section,
-    body.light .preview { background: #ffffff; border-color: #d0d7de; }
-    body.light textarea {
-      background: #f6f8fa;
-      border-color: #d0d7de;
-      color: #1f2328;
-    }
+    body.light .top-bar .date-badge { background: #ffffff; border-color: #d0d7de; color: #0969da; }
+    body.light .panel,
+    body.light .history-section { background: #ffffff; border-color: #d0d7de; }
+    body.light .panel h2,
+    body.light .history-section h2 { border-bottom-color: #d0d7de; }
+    body.light textarea { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
     body.light textarea:focus { border-color: #0969da; }
-    body.light .btn-clear { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
     body.light .preview-content { background: #f6f8fa; }
+    body.light .btn-clear { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+    body.light .history-item { background: #f6f8fa; border-color: #d0d7de; }
+    body.light .history-item .h-date { color: #0969da; }
+    body.light .history-item .h-preview { color: #656d76; }
+    body.light .h-btn { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
 
     .theme-toggle {
       position: fixed;
@@ -124,6 +176,10 @@
       z-index: 999;
     }
     body.light .theme-toggle { background: #ffffff; border-color: #d0d7de; color: #1f2328; }
+
+    @media (max-width: 700px) {
+      .main-layout { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
@@ -131,57 +187,74 @@
 
   <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
 
-  <div class="container">
+  <div class="top-bar">
     <h1>📝 每日工作日志</h1>
-    <p class="subtitle" id="dateDisplay"></p>
+    <span class="date-badge" id="dateBadge"></span>
+  </div>
 
-    <div class="section">
-      <label>✅ 今日完成</label>
-      <textarea id="done" placeholder="每行一项，例如：
-完成需求优先级打分器
-学习 HTML/CSS/JS 三件套
-推了 9 个 commit 到 GitHub"></textarea>
+  <div class="main-layout">
+    <!-- 左：输入 -->
+    <div class="panel">
+      <h2>✍️ 填写今日日志</h2>
+      <div class="field">
+        <label>✅ 今日完成</label>
+        <textarea id="done" class="tall" placeholder="每行一项"></textarea>
+      </div>
+      <div class="field">
+        <label>🧠 技术收获</label>
+        <textarea id="learned" class="tall" placeholder="今天学到了什么"></textarea>
+      </div>
+      <div class="field">
+        <label>🔜 明天计划</label>
+        <textarea id="plan" placeholder="明天打算做什么"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-save" id="btnSave">💾 保存</button>
+        <button class="btn btn-export" id="btnExport">📥 导出 Markdown</button>
+        <button class="btn btn-clear" id="btnClear">🔄 清空</button>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:#484f58;" id="saveHint"></div>
     </div>
 
-    <div class="section">
-      <label>🧠 技术收获</label>
-      <textarea id="learned" placeholder="今天学到了什么新技术或心得"></textarea>
+    <!-- 右：预览 -->
+    <div class="panel">
+      <h2>👁️ 实时预览</h2>
+      <div class="preview-content" id="previewContent">在左边填写内容，这里实时显示 Markdown 预览…</div>
     </div>
+  </div>
 
-    <div class="section">
-      <label>🔜 明天计划</label>
-      <textarea id="plan" placeholder="明天打算做什么"></textarea>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn btn-primary" id="btnPreview">👁️ 预览</button>
-      <button class="btn btn-export" id="btnExport">📥 导出 Markdown</button>
-      <button class="btn btn-clear" id="btnClear">🔄 清空</button>
-    </div>
-
-    <div class="preview" id="previewBox">
-      <h2>📋 预览</h2>
-      <div class="preview-content" id="previewContent"></div>
+  <!-- 历史记录 -->
+  <div class="history-section">
+    <h2>📚 历史日志</h2>
+    <div class="history-list" id="historyList">
+      <div class="empty-hint">还没有保存过日志</div>
     </div>
   </div>
 
   <script>
+    const STORAGE_KEY = 'pm_logs';
     const now = new Date();
-    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-    document.getElementById('dateDisplay').textContent = `📅 ${dateStr}`;
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    document.getElementById('dateBadge').textContent = `📅 ${today}`;
 
-    function buildMarkdown() {
-      const done = document.getElementById('done').value.trim();
-      const learned = document.getElementById('learned').value.trim();
-      const plan = document.getElementById('plan').value.trim();
+    // ============================================================
+    // 数据存取
+    // ============================================================
+    function getAllLogs() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+      catch { return {}; }
+    }
+    function saveAllLogs(logs) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(logs));
+    }
 
-      const doneList = done ? done.split('\n').map(l => `- [x] ${l.trim()}`).join('\n') : '- [ ] ';
-      const learnedList = learned ? learned.split('\n').map(l => `- ${l.trim()}`).join('\n') : '- ';
-      const planList = plan ? plan.split('\n').map(l => `- [ ] ${l.trim()}`).join('\n') : '- [ ] ';
+    function buildMarkdown(data) {
+      const doneList = data.done ? data.done.split('\n').map(l => `- [x] ${l.trim()}`).join('\n') : '- [ ] ';
+      const learnedList = data.learned ? data.learned.split('\n').map(l => `- ${l.trim()}`).join('\n') : '- ';
+      const planList = data.plan ? data.plan.split('\n').map(l => `- [ ] ${l.trim()}`).join('\n') : '- [ ] ';
+      return `# 📋 每日工作日志 — ${data.date || today}
 
-      return `# 📋 每日工作日志 — ${dateStr}
-
-> 由默默的工具箱自动生成 🎉
+> 由 PM 工具箱自动生成 🎉
 
 ## ✅ 今日完成
 ${doneList}
@@ -193,55 +266,151 @@ ${learnedList}
 ${planList}
 
 ---
-*生成时间：${now.toLocaleTimeString('zh-CN')}*
+*生成时间：${new Date().toLocaleTimeString('zh-CN')}*
 `;
     }
 
-    document.getElementById('btnPreview').addEventListener('click', () => {
-      const md = buildMarkdown();
-      document.getElementById('previewContent').textContent = md;
-      document.getElementById('previewBox').style.display = 'block';
-    });
-
-    document.getElementById('btnExport').addEventListener('click', () => {
-      const md = buildMarkdown();
-      const blob = new Blob(['\uFEFF' + md], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `pm-log-${dateStr}.md`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    document.getElementById('btnClear').addEventListener('click', () => {
-      document.getElementById('done').value = '';
-      document.getElementById('learned').value = '';
-      document.getElementById('plan').value = '';
-      document.getElementById('previewBox').style.display = 'none';
-    });
-
-    // 自动加载今天已有的日志（如果之前导出过，试试 localStorage）
-    const saved = localStorage.getItem(`log_${dateStr}`);
-    if (saved) {
-      const data = JSON.parse(saved);
-      document.getElementById('done').value = data.done || '';
-      document.getElementById('learned').value = data.learned || '';
-      document.getElementById('plan').value = data.plan || '';
+    // 加载今天的日志
+    function loadToday() {
+      const logs = getAllLogs();
+      if (logs[today]) {
+        document.getElementById('done').value = logs[today].done || '';
+        document.getElementById('learned').value = logs[today].learned || '';
+        document.getElementById('plan').value = logs[today].plan || '';
+      }
+      updatePreview();
     }
 
-    // 自动保存（输入框失焦时保存到 localStorage）
-    function autoSave() {
+    // 实时预览
+    function updatePreview() {
       const data = {
+        date: today,
         done: document.getElementById('done').value,
         learned: document.getElementById('learned').value,
         plan: document.getElementById('plan').value,
       };
-      localStorage.setItem(`log_${dateStr}`, JSON.stringify(data));
+      document.getElementById('previewContent').textContent = buildMarkdown(data);
     }
-    ['done','learned','plan'].forEach(id => {
-      document.getElementById(id).addEventListener('blur', autoSave);
+
+    // 保存
+    document.getElementById('btnSave').addEventListener('click', () => {
+      const logs = getAllLogs();
+      logs[today] = {
+        done: document.getElementById('done').value,
+        learned: document.getElementById('learned').value,
+        plan: document.getElementById('plan').value,
+        savedAt: new Date().toISOString(),
+      };
+      saveAllLogs(logs);
+      document.getElementById('saveHint').textContent = '✅ 已保存 ' + new Date().toLocaleTimeString('zh-CN');
+      renderHistory();
     });
+
+    // 实时预览
+    ['done','learned','plan'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+    // 导出
+    document.getElementById('btnExport').addEventListener('click', () => {
+      const data = {
+        date: today,
+        done: document.getElementById('done').value,
+        learned: document.getElementById('learned').value,
+        plan: document.getElementById('plan').value,
+      };
+      const md = buildMarkdown(data);
+      const blob = new Blob(['\uFEFF' + md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pm-log-${today}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      // 同时自动保存
+      const logs = getAllLogs();
+      logs[today] = data;
+      saveAllLogs(logs);
+      renderHistory();
+    });
+
+    // 清空
+    document.getElementById('btnClear').addEventListener('click', () => {
+      document.getElementById('done').value = '';
+      document.getElementById('learned').value = '';
+      document.getElementById('plan').value = '';
+      updatePreview();
+      document.getElementById('saveHint').textContent = '';
+    });
+
+    // ============================================================
+    // 历史记录
+    // ============================================================
+    function renderHistory() {
+      const logs = getAllLogs();
+      const dates = Object.keys(logs).sort().reverse(); // 最新在前
+      const list = document.getElementById('historyList');
+
+      if (dates.length === 0) {
+        list.innerHTML = '<div class="empty-hint">还没有保存过日志</div>';
+        return;
+      }
+
+      list.innerHTML = dates.map(date => {
+        const log = logs[date];
+        const firstLine = (log.done || '').split('\n')[0] || '(空)';
+        return `
+          <div class="history-item">
+            <span class="h-date">📅 ${date}</span>
+            <span class="h-preview">${firstLine.slice(0, 50)}</span>
+            <span class="h-actions">
+              <button class="h-btn" data-date="${date}" data-action="load">📂 加载</button>
+              <button class="h-btn" data-date="${date}" data-action="export">📥 导出</button>
+              <button class="h-btn danger" data-date="${date}" data-action="delete">🗑</button>
+            </span>
+          </div>
+        `;
+      }).join('');
+
+      // 绑定事件
+      list.querySelectorAll('.h-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const date = btn.dataset.date;
+          const action = btn.dataset.action;
+
+          if (action === 'load') {
+            const logs = getAllLogs();
+            if (confirm(`加载 ${date} 的日志到编辑区？当前未保存的内容会丢失。`)) {
+              document.getElementById('done').value = logs[date].done || '';
+              document.getElementById('learned').value = logs[date].learned || '';
+              document.getElementById('plan').value = logs[date].plan || '';
+              updatePreview();
+              document.getElementById('dateBadge').textContent = `📅 正在编辑：${date}`;
+              document.getElementById('saveHint').textContent = '⚠️ 注意：你正在编辑历史日志，保存将覆盖原内容';
+            }
+          } else if (action === 'export') {
+            const logs = getAllLogs();
+            const md = buildMarkdown({ ...logs[date], date });
+            const blob = new Blob(['\uFEFF' + md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pm-log-${date}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } else if (action === 'delete') {
+            if (confirm(`删除 ${date} 的日志？不可恢复。`)) {
+              const logs = getAllLogs();
+              delete logs[date];
+              saveAllLogs(logs);
+              renderHistory();
+            }
+          }
+        });
+      });
+    }
 
     // 主题
     const toggle = document.getElementById('themeToggle');
@@ -254,6 +423,10 @@ ${planList}
       toggle.textContent = isLight ? '☀️' : '🌙';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     });
+
+    // 初始化
+    loadToday();
+    renderHistory();
   </script>
 
 </body>
