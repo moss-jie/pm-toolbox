@@ -326,6 +326,63 @@
     body.light .empty-hint {
       color: #8b949e;
     }
+
+    /* ============================================
+       可视化图表
+       ============================================ */
+    .chart-section {
+      margin-top: 32px;
+    }
+    .chart-section h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .chart-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .chart-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chart-label {
+      width: 120px;
+      font-size: 13px;
+      text-align: right;
+      flex-shrink: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .chart-bar-wrap {
+      flex: 1;
+      background: #21262d;
+      border-radius: 4px;
+      height: 24px;
+      overflow: hidden;
+    }
+    .chart-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      min-width: fit-content;
+      white-space: nowrap;
+    }
+    .chart-bar.high { background: #238636; }
+    .chart-bar.mid  { background: #d29922; }
+    .chart-bar.low  { background: #58a6ff; }
+
+    body.light .chart-bar-wrap {
+      background: #d0d7de;
+    }
     body.light .theme-toggle {
       background: #ffffff;
       border-color: #d0d7de;
@@ -389,6 +446,12 @@
       <div class="saved-list" id="savedList">
         <div class="empty-hint">还没有保存任何需求，打分后点保存</div>
       </div>
+    </div>
+
+    <!-- 可视化图表：横向条形图，一眼看出优先级高低 -->
+    <div class="chart-section" id="chartSection" style="display:none;">
+      <h2>📊 优先级对比图</h2>
+      <div class="chart-list" id="chartList"></div>
     </div>
   </div>
 
@@ -579,11 +642,15 @@
         item.remove();
         // remove() = 把这个元素从页面删除
         checkEmpty();
+        renderChart();
       });
 
       // 加到列表最前面
       savedList.prepend(item);
       // prepend = 插入到第一个位置
+
+      // 更新图表
+      renderChart();
 
       // 清空输入框，方便输入下一个需求
       reqNameInput.value = '';
@@ -606,6 +673,63 @@
       } else if (items.length > 0 && emptyHint) {
         emptyHint.remove();
       }
+    }
+
+    // ============================================================
+    // 可视化图表：从已保存列表中读取数据，画横向条形图
+    // ============================================================
+
+    function renderChart() {
+      const chartSection = document.getElementById('chartSection');
+      const chartList = document.getElementById('chartList');
+      const items = savedList.querySelectorAll('.saved-item');
+
+      // 没有数据时隐藏图表
+      if (items.length === 0) {
+        chartSection.style.display = 'none';
+        return;
+      }
+
+      chartSection.style.display = 'block';
+      chartList.innerHTML = '';
+      // innerHTML = '' → 清空之前的内容，准备重画
+
+      // 收集所有需求的名字和分数
+      const data = [];
+      items.forEach((item) => {
+        const name = item.querySelector('.s-name').childNodes[0].textContent.trim();
+        const score = parseFloat(item.querySelector('.s-score').textContent);
+        data.push({ name, score });
+      });
+      // parseFloat = 把 "3.5" 变成数字 3.5（区别于 parseInt 只能取整数）
+
+      // 按分数从高到低排序
+      data.sort((a, b) => b.score - a.score);
+
+      // 画条形图
+      data.forEach((d) => {
+        const barWidth = (d.score / 5) * 100;
+        // 5 分满分为 100%
+
+        let level = 'low';
+        if (d.score >= 4.0) level = 'high';
+        else if (d.score >= 2.5) level = 'mid';
+
+        const row = document.createElement('div');
+        row.className = 'chart-item';
+        row.innerHTML = `
+          <span class="chart-label">${d.name}</span>
+          <div class="chart-bar-wrap">
+            <div class="chart-bar ${level}" style="width:${barWidth}%;">
+              ${d.score}
+            </div>
+          </div>
+        `;
+        chartList.appendChild(row);
+
+        // 小技巧：先插入 DOM，再设置宽度，让动画生效
+        // 实际上我们直接在 innerHTML 里设置了样式，Chrome 会自动过渡
+      });
     }
 
     // ============================================================
