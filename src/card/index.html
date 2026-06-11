@@ -49,6 +49,21 @@
     }
 
     /* --- ② body = 整个网页的背景和字体 --- */
+    .back-btn {
+      position: fixed;
+      top: 20px; left: 20px;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 13px;
+      z-index: 999;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { color: #fff; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.15); }
+
     body {
       /* 背景渐变：从深蓝渐变到紫色 */
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
@@ -191,6 +206,8 @@
 </head>
 
 <body>
+
+  <a href="../../index.html" class="back-btn" title="返回导航页">← 返回</a>
 
   <!--
     body = 网页的「可见区」—— 用户能看到的所有内容
