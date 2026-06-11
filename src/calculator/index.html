@@ -29,8 +29,22 @@
 
     .container {
       width: 100%;
-      max-width: 560px;
-      /* 限制最大宽度，在大屏幕上不会撑太宽 */
+      max-width: 1100px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .left-panel, .right-panel {
+      min-width: 0;
+    }
+    @media (max-width: 800px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* --- 标题区 --- */
@@ -421,55 +435,42 @@
     <h1>📊 需求优先级打分器</h1>
     <p class="subtitle">拖动滑块对每个维度打分，加权算出综合优先级</p>
 
-    <!-- 需求名称 -->
-    <input
-      type="text"
-      class="name-input"
-      id="reqName"
-      placeholder="输入需求名称，比如「用户反馈智能分类」"
-    >
+    <div class="layout">
+      <!-- 左侧：输入 + 打分 -->
+      <div class="left-panel">
+        <input
+          type="text"
+          class="name-input"
+          id="reqName"
+          placeholder="输入需求名称，比如「用户反馈智能分类」"
+        >
+        <div class="criteria-list" id="criteriaList"></div>
+        <button class="btn-save" id="btnSave">💾 保存这个需求</button>
+      </div>
 
-    <!-- 5 个评分维度 -->
-    <div class="criteria-list" id="criteriaList">
-      <!--
-        每个维度的 HTML 结构：
-        <div class="criterion">
-          <div class="criterion-header">
-            <span class="criterion-name">维度名</span>
-            <span class="criterion-meta">权重: %</span>
-            <span class="criterion-score">分数</span>
+      <!-- 右侧：结果 + 列表 + 图表 -->
+      <div class="right-panel">
+        <div class="result-box" id="resultBox">
+          <div class="result-label">综合得分</div>
+          <div class="result-score" id="resultScore">3.0</div>
+          <div class="result-bar-wrap">
+            <div class="result-bar" id="resultBar" style="width: 60%;"></div>
           </div>
-          <input type="range" min="1" max="5" value="3">
+          <div class="result-verdict" id="resultVerdict">中等优先级</div>
         </div>
-        但我们用 JS 动态生成，这样以后改维度只需改数据，不用改 HTML
-      -->
-    </div>
 
-    <!-- 保存按钮 -->
-    <button class="btn-save" id="btnSave">💾 保存这个需求</button>
+        <div class="saved-section">
+          <h2>📋 已保存的需求</h2>
+          <div class="saved-list" id="savedList">
+            <div class="empty-hint">还没有保存任何需求，打分后点保存</div>
+          </div>
+        </div>
 
-    <!-- 实时结果 -->
-    <div class="result-box" id="resultBox">
-      <div class="result-label">综合得分</div>
-      <div class="result-score" id="resultScore">3.0</div>
-      <div class="result-bar-wrap">
-        <div class="result-bar" id="resultBar" style="width: 60%;"></div>
+        <div class="chart-section" id="chartSection" style="display:none;">
+          <h2>📊 优先级对比图</h2>
+          <div class="chart-list" id="chartList"></div>
+        </div>
       </div>
-      <div class="result-verdict" id="resultVerdict">中等优先级</div>
-    </div>
-
-    <!-- 已保存的需求列表 -->
-    <div class="saved-section">
-      <h2>📋 已保存的需求</h2>
-      <div class="saved-list" id="savedList">
-        <div class="empty-hint">还没有保存任何需求，打分后点保存</div>
-      </div>
-    </div>
-
-    <!-- 可视化图表：横向条形图，一眼看出优先级高低 -->
-    <div class="chart-section" id="chartSection" style="display:none;">
-      <h2>📊 优先级对比图</h2>
-      <div class="chart-list" id="chartList"></div>
     </div>
   </div>
 

@@ -19,7 +19,17 @@
       min-height: 100vh;
     }
 
-    .container { width: 100%; max-width: 750px; }
+    .container { width: 100%; max-width: 1100px; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+    }
 
     h1 { font-size: 24px; margin-bottom: 4px; }
     .subtitle { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
@@ -159,7 +169,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* --- 结果区 --- */
-    .result-section { display: none; /* 默认隐藏，解析后才显示 */ }
+    .result-section { /* 始终可见 */ }
 
     .summary-bar {
       display: flex;
@@ -336,43 +346,47 @@
     <h1>📋 PRD → 开发任务转换器</h1>
     <p class="subtitle">粘贴你的 PRD 文本，自动拆解为可执行的开发任务清单</p>
 
-    <!-- 输入区 -->
-    <div class="input-section">
-      <label>📝 粘贴 PRD 内容</label>
-      <textarea
-        class="prd-input"
-        id="prdInput"
-        placeholder="在此粘贴 PRD 文本...
+    <div class="layout">
+      <!-- 左侧：输入区 -->
+      <div class="input-section">
+        <label>📝 粘贴 PRD 内容</label>
+        <textarea
+          class="prd-input"
+          id="prdInput"
+          placeholder="在此粘贴 PRD 文本...
 支持格式：标题用 ## 或 ### 开头，功能点用 - 或 1. 列表，中英文均可"
-      ></textarea>
+        ></textarea>
 
-      <button class="example-btn" id="btnExample">📥 加载示例 PRD</button>
+        <button class="example-btn" id="btnExample">📥 加载示例 PRD</button>
 
-      <button class="btn-convert" id="btnConvert">⚡ 规则引擎拆解</button>
+        <button class="btn-convert" id="btnConvert">⚡ 规则引擎拆解</button>
 
-      <div class="api-key-row">
-        <input
-          type="password"
-          class="api-key-input"
-          id="apiKeyInput"
-          placeholder="粘贴 DeepSeek API Key（sk-...）"
-        >
-        <button class="api-key-save" id="btnSaveKey">💾 保存</button>
+        <div class="api-key-row">
+          <input
+            type="password"
+            class="api-key-input"
+            id="apiKeyInput"
+            placeholder="粘贴 DeepSeek API Key（sk-...）"
+          >
+          <button class="api-key-save" id="btnSaveKey">💾 保存</button>
+        </div>
+        <div class="api-key-status" id="apiKeyStatus"></div>
+
+        <button class="btn-ai" id="btnAI" disabled>🤖 AI 智能解析（请先保存 API Key）</button>
       </div>
-      <div class="api-key-status" id="apiKeyStatus"></div>
 
-      <button class="btn-ai" id="btnAI" disabled>🤖 AI 智能解析（请先保存 API Key）</button>
-    </div>
-
-    <!-- 结果区 -->
-    <div class="result-section" id="resultSection">
-      <div class="summary-bar" id="summaryBar"></div>
-      <div class="task-list" id="taskList"></div>
-      <div class="export-bar">
-        <button class="btn-export" id="btnExportMD">📥 导出 Markdown</button>
-        <button class="btn-export" id="btnExportCSV">📊 导出 CSV</button>
-        <button class="btn-export" id="btnExportTXT">📄 导出文本</button>
-        <button class="btn-clear" id="btnClear">🔄 重新输入</button>
+      <!-- 右侧：结果区 -->
+      <div class="result-section" id="resultSection">
+        <div class="summary-bar" id="summaryBar"></div>
+        <div class="task-list" id="taskList">
+          <p style="color:#8b949e;text-align:center;padding:40px;">👈 粘贴 PRD 后点击解析，结果会显示在这里</p>
+        </div>
+        <div class="export-bar">
+          <button class="btn-export" id="btnExportMD">📥 Markdown</button>
+          <button class="btn-export" id="btnExportCSV">📊 CSV</button>
+          <button class="btn-export" id="btnExportTXT">📄 文本</button>
+          <button class="btn-clear" id="btnClear">🔄 重新输入</button>
+        </div>
       </div>
     </div>
   </div>
@@ -509,18 +523,14 @@
     // ============================================================
 
     function renderResults(tasks) {
-      const section = document.getElementById('resultSection');
       const summaryBar = document.getElementById('summaryBar');
       const taskList = document.getElementById('taskList');
 
       if (tasks.length === 0) {
-        section.style.display = 'block';
         summaryBar.innerHTML = '';
         taskList.innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px;">没有识别到任务项。请确保 PRD 包含 - 或 1. 开头的功能点。</p>';
         return;
       }
-
-      section.style.display = 'block';
 
       // 统计摘要
       const totalHours = tasks.reduce((sum, t) => sum + t.hours, 0);
@@ -662,7 +672,8 @@
 
     document.getElementById('btnClear').addEventListener('click', () => {
       document.getElementById('prdInput').value = '';
-      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('summaryBar').innerHTML = '';
+      document.getElementById('taskList').innerHTML = '<p style="color:#8b949e;text-align:center;padding:40px;">👈 粘贴 PRD 后点击解析，结果会显示在这里</p>';
       currentTasks = [];
     });
 
@@ -714,7 +725,6 @@
       // 显示加载状态
       btnAI.disabled = true;
       btnAI.innerHTML = '<span class="loading-spinner"></span> AI 正在理解需求...';
-      document.getElementById('resultSection').style.display = 'block';
       document.getElementById('summaryBar').innerHTML = '';
       document.getElementById('taskList').innerHTML =
         '<p style="color:#8b949e;text-align:center;padding:40px;">🤖 AI 正在分析 PRD 内容，请稍候...</p>';
