@@ -65,7 +65,7 @@
     .prd-input:focus { border-color: #58a6ff; }
     .prd-input::placeholder { color: #484f58; }
 
-    .example-btn {
+    .example-btn, .import-btn {
       background: none;
       border: 1px solid #30363d;
       color: #8b949e;
@@ -73,39 +73,30 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       margin-right: 8px;
     }
-    .example-btn:hover { color: #58a6ff; border-color: #58a6ff; }
+    .example-btn:hover, .import-btn:hover { color: #58a6ff; border-color: #58a6ff; }
+    .import-btn { color: #7ee787; border-color: #238636; }
+    .import-btn:hover { color: #7ee787; border-color: #2ea043; }
+    #fileInput { display: none; }
 
-    .btn-convert {
-      width: 100%;
-      padding: 12px;
+    .btn-row { display: flex; gap: 8px; }
+    .btn-convert, .btn-ai {
+      flex: 1;
+      padding: 10px;
       background: #1f6feb;
       border: none;
       border-radius: 8px;
       color: white;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.2s;
     }
     .btn-convert:hover { background: #388bfd; }
     .btn-convert:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
-
-    .btn-ai {
-      width: 100%;
-      padding: 12px;
-      background: #6e40c9;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 8px;
-    }
+    .btn-ai { background: #6e40c9; }
     .btn-ai:hover { background: #8957e5; }
     .btn-ai:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
 
@@ -244,9 +235,10 @@
     .tag-p2     { background: rgba(88,166,255,0.15); color: #58a6ff; }
 
     .export-bar {
-      margin-top: 20px;
+      margin-top: 8px;
       display: flex;
-      gap: 10px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
     .btn-export {
       padding: 10px 20px;
@@ -357,9 +349,14 @@
 支持格式：标题用 ## 或 ### 开头，功能点用 - 或 1. 列表，中英文均可"
         ></textarea>
 
-        <button class="example-btn" id="btnExample">📥 加载示例 PRD</button>
+        <button class="example-btn" id="btnExample">📥 加载示例</button>
+        <button class="import-btn" id="btnImport">📂 导入文档</button>
+        <input type="file" id="fileInput" accept=".txt,.md,.csv">
 
-        <button class="btn-convert" id="btnConvert">⚡ 规则引擎拆解</button>
+        <div class="btn-row">
+          <button class="btn-convert" id="btnConvert">⚡ 规则引擎拆解</button>
+          <button class="btn-ai" id="btnAI" disabled>🤖 AI 智能解析</button>
+        </div>
 
         <div class="api-key-row">
           <input
@@ -371,8 +368,6 @@
           <button class="api-key-save" id="btnSaveKey">💾 保存</button>
         </div>
         <div class="api-key-status" id="apiKeyStatus"></div>
-
-        <button class="btn-ai" id="btnAI" disabled>🤖 AI 智能解析（请先保存 API Key）</button>
 
         <div class="export-bar">
           <button class="btn-export" id="btnExportMD">📥 Markdown</button>
@@ -659,6 +654,20 @@
 
     document.getElementById('btnExample').addEventListener('click', () => {
       document.getElementById('prdInput').value = EXAMPLE_PRD;
+    });
+
+    // 文件导入
+    document.getElementById('btnImport').addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('prdInput').value = ev.target.result;
+      };
+      reader.readAsText(file, 'UTF-8');
     });
 
     document.getElementById('btnExportMD').addEventListener('click', () => {
