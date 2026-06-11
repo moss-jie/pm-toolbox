@@ -97,10 +97,24 @@
       min-height: 300px;
       max-height: 500px;
       overflow-y: auto;
-      white-space: pre-wrap;
     }
-    .preview-content h1 { font-size: 18px; margin-bottom: 8px; }
-    .preview-content h2 { font-size: 15px; margin: 14px 0 6px; border: none; padding: 0; }
+    .preview-content h1 { font-size: 20px; margin-bottom: 10px; color: #e6edf3; }
+    .preview-content h2 { font-size: 16px; margin: 16px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #21262d; color: #e6edf3; }
+    .preview-content h3 { font-size: 14px; margin: 12px 0 6px; color: #e6edf3; }
+    .preview-content ul { padding-left: 20px; margin: 6px 0; }
+    .preview-content li { margin: 3px 0; }
+    .preview-content li input[type="checkbox"] { margin-right: 6px; pointer-events: none; }
+    .preview-content hr { border: none; border-top: 1px solid #21262d; margin: 12px 0; }
+    .preview-content blockquote {
+      border-left: 3px solid #58a6ff;
+      padding: 4px 12px;
+      margin: 8px 0;
+      color: #8b949e;
+      background: rgba(88,166,255,0.05);
+      border-radius: 0 4px 4px 0;
+    }
+    .preview-content p { margin: 4px 0; }
+    .preview-content strong { color: #e6edf3; }
 
     /* 底部：历史记录 */
     .history-section {
@@ -283,6 +297,59 @@ ${planList}
       updatePreview();
     }
 
+    // 简单的 Markdown → HTML 渲染器
+    function mdToHTML(md) {
+      let html = '';
+      const lines = md.split('\n');
+      let inList = false;
+
+      lines.forEach((line) => {
+        // 标题
+        if (line.startsWith('# ')) {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          html += `<h1>${line.slice(2)}</h1>\n`;
+        } else if (line.startsWith('## ')) {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          html += `<h2>${line.slice(3)}</h2>\n`;
+        } else if (line.startsWith('### ')) {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          html += `<h3>${line.slice(4)}</h3>\n`;
+        // 分隔线
+        } else if (line.trim() === '---') {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          html += '<hr>\n';
+        // 引用
+        } else if (line.startsWith('> ')) {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          html += `<blockquote>${line.slice(2)}</blockquote>\n`;
+        // 已完成任务
+        } else if (line.match(/^- \[x\] /)) {
+          if (!inList) { html += '<ul>\n'; inList = true; }
+          html += `<li><input type="checkbox" checked disabled> ${line.replace(/^- \[x\] /, '')}</li>\n`;
+        // 待办任务
+        } else if (line.match(/^- \[ \] /)) {
+          if (!inList) { html += '<ul>\n'; inList = true; }
+          html += `<li><input type="checkbox" disabled> ${line.replace(/^- \[ \] /, '')}</li>\n`;
+        // 无序列表
+        } else if (line.startsWith('- ')) {
+          if (!inList) { html += '<ul>\n'; inList = true; }
+          html += `<li>${line.slice(2)}</li>\n`;
+        // 粗体 + 斜体转义
+        } else if (line.trim()) {
+          if (inList) { html += '</ul>\n'; inList = false; }
+          let txt = line;
+          txt = txt.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          txt = txt.replace(/\*(.+?)\*/g, '<em>$1</em>');
+          html += `<p>${txt}</p>\n`;
+        } else {
+          if (inList) { html += '</ul>\n'; inList = false; }
+        }
+      });
+
+      if (inList) html += '</ul>\n';
+      return html;
+    }
+
     // 实时预览
     function updatePreview() {
       const data = {
@@ -291,7 +358,8 @@ ${planList}
         learned: document.getElementById('learned').value,
         plan: document.getElementById('plan').value,
       };
-      document.getElementById('previewContent').textContent = buildMarkdown(data);
+      const md = buildMarkdown(data);
+      document.getElementById('previewContent').innerHTML = mdToHTML(md);
     }
 
     // 保存
