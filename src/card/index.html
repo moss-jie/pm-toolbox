@@ -224,38 +224,6 @@
 </head>
 
 <body>
-  <script>
-    (function(){
-      var t=document.querySelector('.theme-toggle');
-      function applyLight(){
-        document.querySelector('body').style.background='#f6f8fa';
-        document.querySelector('.card').style.background='rgba(0,0,0,0.04)';
-        document.querySelector('.card').style.border='1px solid #d0d7de';
-        document.querySelector('.card').style.color='#1f2328';
-        document.querySelector('.card h1').style.color='#1f2328';
-        document.querySelector('.card .role').style.color='#656d76';
-        document.querySelectorAll('.tag').forEach(function(el){el.style.background='rgba(9,105,218,0.1)';el.style.color='#0969da';el.style.borderColor='rgba(9,105,218,0.3)';});
-        document.querySelectorAll('.contact-item').forEach(function(el){el.style.background='rgba(0,0,0,0.04)';el.style.color='#656d76';});
-        t.textContent='☀️';
-      }
-      function applyDark(){
-        document.querySelector('body').style.background='';
-        document.querySelector('.card').style.background='';
-        document.querySelector('.card').style.border='';
-        document.querySelector('.card').style.color='';
-        document.querySelector('.card h1').style.color='';
-        document.querySelector('.card .role').style.color='';
-        document.querySelectorAll('.tag').forEach(function(el){el.style.background='';el.style.color='';el.style.borderColor='';});
-        document.querySelectorAll('.contact-item').forEach(function(el){el.style.background='';el.style.color='';});
-        t.textContent='🌙';
-      }
-      if(localStorage.getItem('theme')==='light'){applyLight();}else{t.textContent='🌙';}
-      t.addEventListener('click',function(){
-        if(t.textContent==='🌙'){applyLight();localStorage.setItem('theme','light');}
-        else{applyDark();localStorage.setItem('theme','dark');}
-      });
-    })();
-  </script>
 
   <a href="../../index.html" class="back-btn" title="返回导航页">← 返回</a>
   <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
@@ -301,6 +269,41 @@
       </div>
     </div>
   </div>
+
+  <script>
+    (function(){
+      var t=document.querySelector('.theme-toggle');
+      function applyLight(){
+        document.querySelector('body').style.background='#f6f8fa';
+        var card=document.querySelector('.card');
+        card.style.background='rgba(0,0,0,0.04)';
+        card.style.border='1px solid #d0d7de';
+        card.style.color='#1f2328';
+        card.querySelector('h1').style.color='#1f2328';
+        card.querySelector('.role').style.color='#656d76';
+        document.querySelectorAll('.tag').forEach(function(el){el.style.background='rgba(9,105,218,0.1)';el.style.color='#0969da';el.style.borderColor='rgba(9,105,218,0.3)';});
+        document.querySelectorAll('.contact-item').forEach(function(el){el.style.background='rgba(0,0,0,0.04)';el.style.color='#656d76';});
+        t.textContent='☀️';
+      }
+      function applyDark(){
+        document.querySelector('body').style.background='';
+        var card=document.querySelector('.card');
+        card.style.background='';
+        card.style.border='';
+        card.style.color='';
+        card.querySelector('h1').style.color='';
+        card.querySelector('.role').style.color='';
+        document.querySelectorAll('.tag').forEach(function(el){el.style.background='';el.style.color='';el.style.borderColor='';});
+        document.querySelectorAll('.contact-item').forEach(function(el){el.style.background='';el.style.color='';});
+        t.textContent='🌙';
+      }
+      if(localStorage.getItem('theme')==='light'){applyLight();}else{t.textContent='🌙';}
+      t.addEventListener('click',function(){
+        if(t.textContent==='🌙'){applyLight();localStorage.setItem('theme','light');}
+        else{applyDark();localStorage.setItem('theme','dark');}
+      });
+    })();
+  </script>
 
 </body>
 </html>
