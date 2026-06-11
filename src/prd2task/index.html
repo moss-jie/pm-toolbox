@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRD → 开发任务 · PM 工具箱</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: -apple-system, BlinkMacSystemFont, "Microsoft YaHei", sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container { width: 100%; max-width: 750px; }
+
+    h1 { font-size: 24px; margin-bottom: 4px; }
+    .subtitle { color: #8b949e; font-size: 14px; margin-bottom: 24px; }
+
+    /* --- 输入区 --- */
+    .input-section {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .input-section label {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .prd-input {
+      width: 100%;
+      height: 200px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 14px;
+      padding: 12px;
+      resize: vertical;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .prd-input:focus { border-color: #58a6ff; }
+    .prd-input::placeholder { color: #484f58; }
+
+    .example-btn {
+      background: none;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-bottom: 12px;
+      margin-right: 8px;
+    }
+    .example-btn:hover { color: #58a6ff; border-color: #58a6ff; }
+
+    .btn-convert {
+      width: 100%;
+      padding: 12px;
+      background: #1f6feb;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-convert:hover { background: #388bfd; }
+    .btn-convert:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+
+    /* --- 结果区 --- */
+    .result-section { display: none; /* 默认隐藏，解析后才显示 */ }
+
+    .summary-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .summary-item {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+    }
+    .summary-item .s-num {
+      font-size: 24px;
+      font-weight: 700;
+      color: #58a6ff;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .task-card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .task-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .task-estimate {
+      background: #21262d;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: #8b949e;
+      white-space: nowrap;
+    }
+    .task-desc {
+      font-size: 13px;
+      color: #8b949e;
+      margin-bottom: 10px;
+    }
+    .task-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-type   { background: rgba(88,166,255,0.15); color: #58a6ff; }
+    .tag-p0     { background: rgba(248,81,73,0.15);  color: #f85149; }
+    .tag-p1     { background: rgba(210,153,34,0.15); color: #d29922; }
+    .tag-p2     { background: rgba(88,166,255,0.15); color: #58a6ff; }
+
+    .export-bar {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .btn-export {
+      padding: 10px 20px;
+      background: #238636;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-export:hover { background: #2ea043; }
+    .btn-clear {
+      padding: 10px 20px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-clear:hover { background: #30363d; }
+
+    /* ============================================
+       亮色模式
+       ============================================ */
+    body.light {
+      background: #f6f8fa;
+      color: #1f2328;
+    }
+    body.light .subtitle { color: #656d76; }
+    body.light .input-section,
+    body.light .summary-item,
+    body.light .task-card {
+      background: #ffffff;
+      border-color: #d0d7de;
+    }
+    body.light .prd-input {
+      background: #f6f8fa;
+      border-color: #d0d7de;
+      color: #1f2328;
+    }
+    body.light .prd-input:focus { border-color: #0969da; }
+    body.light .prd-input::placeholder { color: #8b949e; }
+    body.light .task-desc { color: #656d76; }
+    body.light .task-estimate { background: #f6f8fa; color: #656d76; }
+    body.light .btn-clear { background: #f6f8fa; border-color: #d0d7de; color: #1f2328; }
+    body.light .summary-item .s-num { color: #0969da; }
+    body.light .tag-type { background: rgba(9,105,218,0.1); color: #0969da; }
+    body.light .tag-p2  { background: rgba(9,105,218,0.1); color: #0969da; }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px; right: 20px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid #30363d;
+      background: #161b22;
+      color: #c9d1d9;
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    body.light .theme-toggle {
+      background: #ffffff;
+      border-color: #d0d7de;
+      color: #1f2328;
+    }
+  </style>
+</head>
+
+<body>
+
+  <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+
+  <div class="container">
+    <h1>📋 PRD → 开发任务转换器</h1>
+    <p class="subtitle">粘贴你的 PRD 文本，自动拆解为可执行的开发任务清单</p>
+
+    <!-- 输入区 -->
+    <div class="input-section">
+      <label>📝 粘贴 PRD 内容</label>
+      <textarea
+        class="prd-input"
+        id="prdInput"
+        placeholder="在此粘贴 PRD 文本...
+支持格式：标题用 ## 或 ### 开头，功能点用 - 或 1. 列表，中英文均可"
+      ></textarea>
+
+      <button class="example-btn" id="btnExample">📥 加载示例 PRD</button>
+
+      <button class="btn-convert" id="btnConvert">⚡ 拆解为开发任务</button>
+    </div>
+
+    <!-- 结果区 -->
+    <div class="result-section" id="resultSection">
+      <div class="summary-bar" id="summaryBar"></div>
+      <div class="task-list" id="taskList"></div>
+      <div class="export-bar">
+        <button class="btn-export" id="btnExport">📥 导出 Markdown</button>
+        <button class="btn-clear" id="btnClear">🔄 重新输入</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================
+    // 示例 PRD —— 点击加载，供你测试
+    // ============================================================
+    const EXAMPLE_PRD = `## 用户反馈智能分类系统
+
+### 功能需求
+- 支持从 CSV 文件导入用户反馈数据
+- 自动识别反馈类型（Bug、功能建议、体验问题、其他）
+- 按优先级自动排序（紧急程度 × 影响范围）
+- 生成可视化分类报表（饼图 + 趋势图）
+- 支持关键词搜索和手动修正分类
+
+### 非功能需求
+- 单次导入支持最多 10000 条反馈
+- 分类准确率 ≥ 85%
+- 页面加载时间 < 2 秒
+- 支持 Chrome 和 Edge 浏览器
+
+### 用户权限
+- 管理员可以配置分类规则
+- 普通用户只能查看和导出
+- 支持企业微信扫码登录`;
+
+    // ============================================================
+    // PRD 解析引擎 —— 核心算法
+    // 把自然语言 PRD 拆成结构化任务
+    // ============================================================
+
+    function parsePRD(text) {
+      if (!text.trim()) return [];
+
+      const tasks = [];
+      let currentSection = '';
+
+      // 按行处理
+      const lines = text.split('\n');
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+
+        // 检测章节标题
+        // ## 开头 = 一级章节
+        if (trimmed.startsWith('## ')) {
+          currentSection = trimmed.replace('## ', '').trim();
+          return;
+        }
+        // ### 开头 = 二级章节
+        if (trimmed.startsWith('### ')) {
+          currentSection = trimmed.replace('### ', '').trim();
+          return;
+        }
+
+        // 检测功能点：以 - 或 数字. 或 • 开头
+        const featureMatch = trimmed.match(/^[-•*]\s+(.+)/);
+        const numMatch = trimmed.match(/^(\d+)[.、)]\s*(.+)/);
+
+        let taskText = '';
+        if (featureMatch) {
+          taskText = featureMatch[1];
+        } else if (numMatch) {
+          taskText = numMatch[2];
+        }
+
+        if (taskText) {
+          const task = buildTask(taskText, currentSection);
+          tasks.push(task);
+        }
+      });
+
+      // 按优先级排序
+      tasks.sort((a, b) => {
+        const pOrder = { P0: 0, P1: 1, P2: 2 };
+        return pOrder[a.priority] - pOrder[b.priority];
+      });
+
+      return tasks;
+    }
+
+    function buildTask(text, section) {
+      // 确定任务类型
+      let type = '功能开发';
+      const lower = text.toLowerCase();
+
+      if (section.includes('非功能') || section.includes('性能')) {
+        type = '性能优化';
+      } else if (section.includes('权限') || section.includes('登录') || section.includes('认证')) {
+        type = '权限认证';
+      } else if (text.includes('报表') || text.includes('图表') || text.includes('可视化')) {
+        type = '数据可视化';
+      } else if (text.includes('导入') || text.includes('导出') || text.includes('上传')) {
+        type = '数据处理';
+      } else if (text.includes('搜索') || text.includes('筛选')) {
+        type = '搜索筛选';
+      }
+
+      // 估算工时（基于关键词）
+      let hours = 8; // 默认 1 天
+      if (text.includes('登录') || text.includes('扫码')) hours = 16;
+      else if (text.includes('报表') || text.includes('图表') || text.includes('可视化')) hours = 24;
+      else if (text.includes('导入') || text.includes('导出')) hours = 16;
+      else if (text.includes('搜索')) hours = 10;
+      else if (text.includes('权限') || text.includes('管理员')) hours = 12;
+      else if (text.includes('规则') || text.includes('配置')) hours = 14;
+
+      // 确定优先级
+      let priority = 'P2';
+      if (text.includes('核心') || text.includes('必须') || section.includes('功能需求')) {
+        priority = 'P1';
+      }
+      if (text.includes('登录') || text.includes('权限') || text.includes('安全')) {
+        priority = 'P0';
+      }
+      if (text.includes('准确率') || text.includes('加载') || text.includes('性能')) {
+        priority = 'P1';
+      }
+
+      return {
+        title: text,
+        type,
+        hours,
+        priority,
+        section,
+      };
+    }
+
+    // ============================================================
+    // 渲染结果
+    // ============================================================
+
+    function renderResults(tasks) {
+      const section = document.getElementById('resultSection');
+      const summaryBar = document.getElementById('summaryBar');
+      const taskList = document.getElementById('taskList');
+
+      if (tasks.length === 0) {
+        section.style.display = 'block';
+        summaryBar.innerHTML = '';
+        taskList.innerHTML = '<p style="color:#8b949e;text-align:center;padding:20px;">没有识别到任务项。请确保 PRD 包含 - 或 1. 开头的功能点。</p>';
+        return;
+      }
+
+      section.style.display = 'block';
+
+      // 统计摘要
+      const totalHours = tasks.reduce((sum, t) => sum + t.hours, 0);
+      const p0Count = tasks.filter(t => t.priority === 'P0').length;
+      const p1Count = tasks.filter(t => t.priority === 'P1').length;
+      const p2Count = tasks.filter(t => t.priority === 'P2').length;
+
+      summaryBar.innerHTML = `
+        <div class="summary-item">
+          <div class="s-num">${tasks.length}</div>
+          <div>任务总数</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-num">${totalHours}h</div>
+          <div>预估总工时</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-num">${Math.ceil(totalHours / 8)}天</div>
+          <div>预估工期</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-num" style="color:#f85149;">${p0Count}</div>
+          <div>P0 紧急</div>
+        </div>
+        <div class="summary-item">
+          <div class="s-num" style="color:#d29922;">${p1Count}</div>
+          <div>P1 重要</div>
+        </div>
+      `;
+
+      // 任务卡片
+      taskList.innerHTML = tasks.map((t, i) => `
+        <div class="task-card">
+          <div class="task-header">
+            <span class="task-title">${i + 1}. ${t.title}</span>
+            <span class="task-estimate">⏱ ${t.hours}h</span>
+          </div>
+          <div class="task-desc">📂 ${t.section || '未分类'}</div>
+          <div class="task-tags">
+            <span class="tag tag-type">${t.type}</span>
+            <span class="tag tag-${t.priority.toLowerCase()}">${t.priority}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ============================================================
+    // 导出 Markdown
+    // ============================================================
+
+    function exportMarkdown(tasks) {
+      const totalHours = tasks.reduce((sum, t) => sum + t.hours, 0);
+      let md = '# 开发任务清单\n\n';
+      md += `> 自动生成 · ${new Date().toLocaleDateString('zh-CN')}\n\n`;
+      md += `- **任务总数**：${tasks.length}\n`;
+      md += `- **预估工时**：${totalHours}h（约 ${Math.ceil(totalHours / 8)} 天）\n\n`;
+      md += '---\n\n';
+
+      tasks.forEach((t, i) => {
+        md += `## ${i + 1}. ${t.title}\n\n`;
+        md += `| 属性 | 值 |\n|------|----|\n`;
+        md += `| 类型 | ${t.type} |\n`;
+        md += `| 优先级 | ${t.priority} |\n`;
+        md += `| 预估工时 | ${t.hours}h |\n`;
+        md += `| 所属模块 | ${t.section || '-'} |\n\n`;
+      });
+
+      // 下载文件
+      const blob = new Blob([md], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `开发任务清单_${new Date().toISOString().slice(0, 10)}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ============================================================
+    // 事件绑定
+    // ============================================================
+
+    let currentTasks = [];
+
+    document.getElementById('btnConvert').addEventListener('click', () => {
+      const text = document.getElementById('prdInput').value;
+      currentTasks = parsePRD(text);
+      renderResults(currentTasks);
+    });
+
+    document.getElementById('btnExample').addEventListener('click', () => {
+      document.getElementById('prdInput').value = EXAMPLE_PRD;
+    });
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      if (currentTasks.length > 0) {
+        exportMarkdown(currentTasks);
+      }
+    });
+
+    document.getElementById('btnClear').addEventListener('click', () => {
+      document.getElementById('prdInput').value = '';
+      document.getElementById('resultSection').style.display = 'none';
+      currentTasks = [];
+    });
+
+    // 主题切换
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light');
+      themeToggle.textContent = '☀️';
+    }
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.body.classList.toggle('light');
+      themeToggle.textContent = isLight ? '☀️' : '🌙';
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    });
+  </script>
+
+</body>
+
+</html>
