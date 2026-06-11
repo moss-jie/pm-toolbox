@@ -210,7 +210,9 @@
       </div>
       <div class="btn-row">
         <button class="btn btn-save" id="btnSave">💾 保存</button>
-        <button class="btn btn-export" id="btnExport">📥 导出 Markdown</button>
+        <button class="btn btn-export" id="btnExportMD">📥 Markdown</button>
+        <button class="btn btn-export" id="btnExportCSV">📊 CSV</button>
+        <button class="btn btn-export" id="btnExportTXT">📄 文本</button>
         <button class="btn btn-clear" id="btnClear">🔄 清空</button>
       </div>
       <div style="margin-top:8px;font-size:11px;color:#484f58;" id="saveHint"></div>
@@ -311,28 +313,73 @@ ${planList}
       document.getElementById(id).addEventListener('input', updatePreview);
     });
 
-    // 导出
-    document.getElementById('btnExport').addEventListener('click', () => {
-      const data = {
+    // 获取当前数据
+    function getCurrentData() {
+      return {
         date: today,
         done: document.getElementById('done').value,
         learned: document.getElementById('learned').value,
         plan: document.getElementById('plan').value,
       };
-      const md = buildMarkdown(data);
-      const blob = new Blob(['\uFEFF' + md], { type: 'text/markdown' });
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob(['\uFEFF' + content], { type: mimeType });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `pm-log-${today}.md`;
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
+    }
 
-      // 同时自动保存
+    function autoSave() {
+      const data = getCurrentData();
       const logs = getAllLogs();
       logs[today] = data;
       saveAllLogs(logs);
       renderHistory();
+    }
+
+    // 导出 Markdown
+    document.getElementById('btnExportMD').addEventListener('click', () => {
+      const md = buildMarkdown(getCurrentData());
+      downloadFile(md, `pm-log-${today}.md`, 'text/markdown');
+      autoSave();
+    });
+
+    // 导出 CSV
+    document.getElementById('btnExportCSV').addEventListener('click', () => {
+      const data = getCurrentData();
+      const doneItems = data.done ? data.done.split('\n').map(l => l.trim()).filter(Boolean) : [];
+      const learnedItems = data.learned ? data.learned.split('\n').map(l => l.trim()).filter(Boolean) : [];
+      const planItems = data.plan ? data.plan.split('\n').map(l => l.trim()).filter(Boolean) : [];
+      const maxRows = Math.max(doneItems.length, learnedItems.length, planItems.length, 1);
+
+      let csv = '类别,内容\n';
+      for (let i = 0; i < maxRows; i++) {
+        if (doneItems[i]) csv += `✅ 今日完成,"${doneItems[i]}"\n`;
+        if (learnedItems[i]) csv += `🧠 技术收获,"${learnedItems[i]}"\n`;
+        if (planItems[i]) csv += `🔜 明天计划,"${planItems[i]}"\n`;
+      }
+      downloadFile(csv, `pm-log-${today}.csv`, 'text/csv');
+      autoSave();
+    });
+
+    // 导出纯文本
+    document.getElementById('btnExportTXT').addEventListener('click', () => {
+      const data = getCurrentData();
+      let txt = `每日工作日志 — ${today}\n`;
+      txt += '═'.repeat(40) + '\n\n';
+      txt += '✅ 今日完成\n';
+      txt += (data.done || '(无)') + '\n\n';
+      txt += '🧠 技术收获\n';
+      txt += (data.learned || '(无)') + '\n\n';
+      txt += '🔜 明天计划\n';
+      txt += (data.plan || '(无)') + '\n\n';
+      txt += `生成时间：${new Date().toLocaleString('zh-CN')}\n`;
+      downloadFile(txt, `pm-log-${today}.txt`, 'text/plain');
+      autoSave();
     });
 
     // 清空
