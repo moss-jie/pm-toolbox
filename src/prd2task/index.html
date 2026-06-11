@@ -83,6 +83,81 @@
     .btn-convert:hover { background: #388bfd; }
     .btn-convert:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
 
+    .btn-ai {
+      width: 100%;
+      padding: 12px;
+      background: #6e40c9;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .btn-ai:hover { background: #8957e5; }
+    .btn-ai:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+
+    .api-key-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .api-key-input {
+      flex: 1;
+      padding: 8px 12px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 13px;
+      outline: none;
+      font-family: monospace;
+    }
+    .api-key-input:focus { border-color: #6e40c9; }
+    .api-key-input::placeholder { color: #484f58; }
+    .api-key-save {
+      padding: 8px 16px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #c9d1d9;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .api-key-save:hover { background: #30363d; }
+    .api-key-status {
+      font-size: 11px;
+      margin-bottom: 8px;
+      color: #238636;
+    }
+    body.light .api-key-input {
+      background: #f6f8fa;
+      border-color: #d0d7de;
+      color: #1f2328;
+    }
+    body.light .api-key-input:focus { border-color: #6e40c9; }
+    body.light .api-key-save {
+      background: #f6f8fa;
+      border-color: #d0d7de;
+      color: #1f2328;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* --- 结果区 --- */
     .result-section { display: none; /* 默认隐藏，解析后才显示 */ }
 
@@ -255,7 +330,20 @@
 
       <button class="example-btn" id="btnExample">📥 加载示例 PRD</button>
 
-      <button class="btn-convert" id="btnConvert">⚡ 拆解为开发任务</button>
+      <button class="btn-convert" id="btnConvert">⚡ 规则引擎拆解</button>
+
+      <div class="api-key-row">
+        <input
+          type="password"
+          class="api-key-input"
+          id="apiKeyInput"
+          placeholder="粘贴 DeepSeek API Key（sk-...）"
+        >
+        <button class="api-key-save" id="btnSaveKey">💾 保存</button>
+      </div>
+      <div class="api-key-status" id="apiKeyStatus"></div>
+
+      <button class="btn-ai" id="btnAI" disabled>🤖 AI 智能解析（请先保存 API Key）</button>
     </div>
 
     <!-- 结果区 -->
@@ -558,6 +646,128 @@
       document.getElementById('prdInput').value = '';
       document.getElementById('resultSection').style.display = 'none';
       currentTasks = [];
+    });
+
+    // ============================================================
+    // AI 解析 —— 调用 DeepSeek API
+    // ============================================================
+
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const apiKeyStatus = document.getElementById('apiKeyStatus');
+    const btnAI = document.getElementById('btnAI');
+    const btnSaveKey = document.getElementById('btnSaveKey');
+
+    // 页面加载时从 localStorage 恢复 API Key
+    const savedKey = localStorage.getItem('deepseek_api_key');
+    if (savedKey) {
+      apiKeyInput.value = savedKey;
+      apiKeyStatus.textContent = '✅ API Key 已就绪';
+      btnAI.disabled = false;
+      btnAI.textContent = '🤖 AI 智能解析';
+    }
+
+    // 保存 API Key
+    btnSaveKey.addEventListener('click', () => {
+      const key = apiKeyInput.value.trim();
+      if (key.startsWith('sk-')) {
+        localStorage.setItem('deepseek_api_key', key);
+        apiKeyStatus.textContent = '✅ API Key 已就绪';
+        apiKeyStatus.style.color = '#238636';
+        btnAI.disabled = false;
+        btnAI.textContent = '🤖 AI 智能解析';
+      } else {
+        apiKeyStatus.textContent = '❌ 无效的 Key（应以 sk- 开头）';
+        apiKeyStatus.style.color = '#f85149';
+      }
+    });
+
+    // AI 解析按钮
+    btnAI.addEventListener('click', async () => {
+      const text = document.getElementById('prdInput').value.trim();
+      if (!text) return;
+
+      const key = localStorage.getItem('deepseek_api_key');
+      if (!key) {
+        apiKeyStatus.textContent = '❌ 请先粘贴并保存 API Key';
+        apiKeyStatus.style.color = '#f85149';
+        return;
+      }
+
+      // 显示加载状态
+      btnAI.disabled = true;
+      btnAI.innerHTML = '<span class="loading-spinner"></span> AI 正在理解需求...';
+      document.getElementById('resultSection').style.display = 'block';
+      document.getElementById('summaryBar').innerHTML = '';
+      document.getElementById('taskList').innerHTML =
+        '<p style="color:#8b949e;text-align:center;padding:40px;">🤖 AI 正在分析 PRD 内容，请稍候...</p>';
+
+      try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: 'deepseek-chat',
+            messages: [
+              {
+                role: 'system',
+                content: `你是一个资深技术经理。分析用户提供的 PRD 文本，拆解为开发任务清单。
+返回纯 JSON 数组（不要 markdown 标记，不要代码块），每个元素格式：
+{"title":"任务名称","type":"功能开发|性能优化|数据处理|权限认证|搜索筛选|数据可视化","priority":"P0|P1|P2","hours":数字,"section":"所属模块"}
+规则：
+- 每个功能点拆成独立任务
+- P0=登录/权限/安全/核心流程，P1=主要功能，P2=辅助功能
+- hours 为预估工时，小功能 4-8h，中等 12-24h，大功能 32-40h
+- type 根据内容智能分类
+- section 取 PRD 中对应的章节名
+- 只返回 JSON 数组，不要任何其他文字`
+              },
+              {
+                role: 'user',
+                content: text,
+              },
+            ],
+            temperature: 0.3,
+            max_tokens: 4096,
+          }),
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.error?.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        const aiContent = data.choices[0].message.content;
+
+        // DeepSeek 有时会在 JSON 外面包 ```json ... ```，去掉
+        let jsonStr = aiContent.trim();
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```$/i, '');
+
+        const tasks = JSON.parse(jsonStr);
+
+        if (!Array.isArray(tasks) || tasks.length === 0) {
+          throw new Error('AI 返回的数据格式异常');
+        }
+
+        currentTasks = tasks;
+        renderResults(tasks);
+
+      } catch (err) {
+        document.getElementById('taskList').innerHTML =
+          `<p style="color:#f85149;text-align:center;padding:20px;">
+            ❌ AI 解析失败：${err.message}<br>
+            <span style="font-size:12px;color:#8b949e;">
+              请检查 API Key 是否正确、网络是否通畅、DeepSeek 余额是否充足
+            </span>
+          </p>`;
+        document.getElementById('summaryBar').innerHTML = '';
+      } finally {
+        btnAI.disabled = false;
+        btnAI.innerHTML = '🤖 AI 智能解析';
+      }
     });
 
     // 主题切换
