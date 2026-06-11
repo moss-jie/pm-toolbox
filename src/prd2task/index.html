@@ -39,8 +39,7 @@
       background: #161b22;
       border: 1px solid #21262d;
       border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
+      padding: 24px;
     }
     .input-section label {
       display: block;
@@ -77,11 +76,11 @@
       margin-right: 8px;
     }
     .example-btn:hover, .import-btn:hover { color: #58a6ff; border-color: #58a6ff; }
-    .import-btn { color: #7ee787; border-color: #238636; }
-    .import-btn:hover { color: #7ee787; border-color: #2ea043; }
+    .import-btn { color: #58a6ff; border-color: #1f6feb; }
+    .import-btn:hover { color: #79c0ff; border-color: #388bfd; }
     #fileInput { display: none; }
 
-    .btn-row { display: flex; gap: 8px; }
+    .btn-row { display: flex; gap: 8px; margin: 12px 0 8px; }
     .btn-convert, .btn-ai {
       flex: 1;
       padding: 10px;
@@ -103,7 +102,7 @@
     .api-key-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin: 10px 0 4px;
     }
     .api-key-input {
       flex: 1;
@@ -235,31 +234,36 @@
     .tag-p2     { background: rgba(88,166,255,0.15); color: #58a6ff; }
 
     .export-bar {
-      margin-top: 8px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
     .btn-export {
-      padding: 10px 20px;
-      background: #238636;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .btn-export:hover { background: #2ea043; }
-    .btn-clear {
-      padding: 10px 20px;
+      padding: 10px 12px;
       background: #21262d;
       border: 1px solid #30363d;
       border-radius: 8px;
       color: #c9d1d9;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 600;
       cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
     }
-    .btn-clear:hover { background: #30363d; }
+    .btn-export:hover { border-color: #58a6ff; color: #58a6ff; }
+    .btn-clear {
+      padding: 10px 12px;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #8b949e;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .btn-clear:hover { border-color: #f85149; color: #f85149; }
 
     /* ============================================
        亮色模式
