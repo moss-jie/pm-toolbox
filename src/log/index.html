@@ -238,6 +238,10 @@
         <textarea id="learned" class="tall" placeholder="今天学到了什么"></textarea>
       </div>
       <div class="field">
+        <label>🤔 遇到的问题</label>
+        <textarea id="problem" class="tall" placeholder="今天踩了什么坑"></textarea>
+      </div>
+      <div class="field">
         <label>🔜 明天计划</label>
         <textarea id="plan" placeholder="明天打算做什么"></textarea>
       </div>
@@ -297,6 +301,9 @@ ${doneList}
 ## 🧠 技术收获
 ${learnedList}
 
+## 🤔 遇到的问题
+${data.problem ? data.problem.split('\n').map(l => '- ' + l.trim()).join('\n') : '- '}
+
 ## 🔜 明天计划
 ${planList}
 
@@ -311,6 +318,7 @@ ${planList}
       if (logs[today]) {
         document.getElementById('done').value = logs[today].done || '';
         document.getElementById('learned').value = logs[today].learned || '';
+        document.getElementById('problem').value = logs[today].problem || '';
         document.getElementById('plan').value = logs[today].plan || '';
       }
       updatePreview();
@@ -375,6 +383,7 @@ ${planList}
         date: today,
         done: document.getElementById('done').value,
         learned: document.getElementById('learned').value,
+        problem: document.getElementById('problem').value,
         plan: document.getElementById('plan').value,
       };
       const md = buildMarkdown(data);
@@ -387,6 +396,7 @@ ${planList}
       logs[today] = {
         done: document.getElementById('done').value,
         learned: document.getElementById('learned').value,
+        problem: document.getElementById('problem').value,
         plan: document.getElementById('plan').value,
         savedAt: new Date().toISOString(),
       };
@@ -396,7 +406,7 @@ ${planList}
     });
 
     // 实时预览
-    ['done','learned','plan'].forEach(id => {
+    ['done','learned','problem','plan'].forEach(id => {
       document.getElementById(id).addEventListener('input', updatePreview);
     });
 
@@ -440,6 +450,7 @@ ${planList}
       const data = getCurrentData();
       const doneItems = data.done ? data.done.split('\n').map(l => l.trim()).filter(Boolean) : [];
       const learnedItems = data.learned ? data.learned.split('\n').map(l => l.trim()).filter(Boolean) : [];
+      const problemItems = data.problem ? data.problem.split('\n').map(l => l.trim()).filter(Boolean) : [];
       const planItems = data.plan ? data.plan.split('\n').map(l => l.trim()).filter(Boolean) : [];
       const maxRows = Math.max(doneItems.length, learnedItems.length, planItems.length, 1);
 
@@ -447,6 +458,7 @@ ${planList}
       for (let i = 0; i < maxRows; i++) {
         if (doneItems[i]) csv += `✅ 今日完成,"${doneItems[i]}"\n`;
         if (learnedItems[i]) csv += `🧠 技术收获,"${learnedItems[i]}"\n`;
+        if (problemItems[i]) csv += `🤔 遇到的问题,"${problemItems[i]}"\n`;
         if (planItems[i]) csv += `🔜 明天计划,"${planItems[i]}"\n`;
       }
       downloadFile(csv, `pm-log-${today}.csv`, 'text/csv');
@@ -462,6 +474,8 @@ ${planList}
       txt += (data.done || '(无)') + '\n\n';
       txt += '🧠 技术收获\n';
       txt += (data.learned || '(无)') + '\n\n';
+      txt += '🤔 遇到的问题\n';
+      txt += (data.problem || '(无)') + '\n\n';
       txt += '🔜 明天计划\n';
       txt += (data.plan || '(无)') + '\n\n';
       txt += `生成时间：${new Date().toLocaleString('zh-CN')}\n`;
@@ -473,6 +487,7 @@ ${planList}
     document.getElementById('btnClear').addEventListener('click', () => {
       document.getElementById('done').value = '';
       document.getElementById('learned').value = '';
+      document.getElementById('problem').value = '';
       document.getElementById('plan').value = '';
       updatePreview();
       document.getElementById('saveHint').textContent = '';
@@ -519,6 +534,7 @@ ${planList}
             if (confirm(`加载 ${date} 的日志到编辑区？当前未保存的内容会丢失。`)) {
               document.getElementById('done').value = logs[date].done || '';
               document.getElementById('learned').value = logs[date].learned || '';
+              document.getElementById('problem').value = logs[date].problem || '';
               document.getElementById('plan').value = logs[date].plan || '';
               updatePreview();
               document.getElementById('dateBadge').textContent = `📅 正在编辑：${date}`;
